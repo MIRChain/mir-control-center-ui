@@ -1,0 +1,326 @@
+import reducer, { initialState, initialPluginState } from './reducer'
+
+describe('the plugin reducer', () => {
+  it('should handle PLUGIN:INIT', () => {
+    const action = {
+      type: 'PLUGIN:INIT',
+      payload: {
+        pluginName: 'parity',
+        pluginData: {
+          name: 'parity',
+          displayName: 'Parity',
+          config: { default: { sync: 'warp' } }
+        },
+        config: { sync: 'warp' },
+        flags: [],
+        type: 'client'
+      }
+    }
+    const expectedState = {
+      ...initialState,
+      parity: {
+        ...initialPluginState,
+        name: 'parity',
+        displayName: 'Parity',
+        config: { sync: 'warp' },
+        flags: [],
+        type: 'client'
+      }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:SELECT', () => {
+    const action = {
+      type: 'PLUGIN:SELECT',
+      payload: { pluginName: 'parity', tab: 0 }
+    }
+    const expectedState = { ...initialState, selected: 'parity' }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:DISMISS_FLAG_WARNING', () => {
+    const action = { type: 'PLUGIN:DISMISS_FLAG_WARNING' }
+    const expectedState = { ...initialState, showCustomFlagWarning: false }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:SELECT_TAB', () => {
+    const action = {
+      type: 'PLUGIN:SELECT_TAB',
+      payload: { tab: 2 }
+    }
+    const expectedState = { ...initialState, selectedTab: 2 }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:SET_CONFIG', () => {
+    const config = {
+      name: 'default',
+      dataDir: '/example',
+      host: 'example',
+      port: '1234',
+      network: 'rinkeby',
+      syncMode: 'light',
+      ipc: 'websockets'
+    }
+    const action = {
+      type: 'PLUGIN:SET_CONFIG',
+      payload: { pluginName: 'mir', config }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: { ...initialPluginState, config }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:START', () => {
+    const action = {
+      type: 'PLUGIN:START',
+      payload: {
+        pluginName: 'mir',
+        version: '0.X.X'
+      }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: {
+        ...initialPluginState,
+        active: { ...initialPluginState.active, version: '0.X.X' }
+      }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:STATUS_UPDATE', () => {
+    const action = {
+      type: 'PLUGIN:STATUS_UPDATE',
+      payload: {
+        pluginName: 'mir',
+        status: 'STARTED'
+      }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: {
+        ...initialPluginState,
+        active: { ...initialPluginState.active, status: 'STARTED' }
+      }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:STOP', () => {
+    const action = {
+      type: 'PLUGIN:STOP',
+      payload: { pluginName: 'mir' }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: { ...initialPluginState }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:ERROR:ADD', () => {
+    const action = {
+      type: 'PLUGIN:ERROR:ADD',
+      error: 'Boom',
+      payload: { pluginName: 'mir' }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: {
+        ...initialPluginState,
+        errors: ['Boom']
+      }
+    }
+
+    expect(
+      reducer({ ...initialState, mir: initialPluginState }, action)
+    ).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:ERROR:CLEAR', () => {
+    const action = {
+      type: 'PLUGIN:ERROR:CLEAR',
+      payload: { pluginName: 'mir', key: 'abc' }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: {
+        ...initialPluginState,
+        errors: [{ key: 'abcd', message: 'boom2' }]
+      }
+    }
+
+    expect(
+      reducer(
+        {
+          ...initialState,
+          mir: {
+            ...initialPluginState,
+            errors: [
+              { key: 'abc', message: 'boom' },
+              { key: 'abcd', message: 'boom2' }
+            ]
+          }
+        },
+        action
+      )
+    ).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:ERROR:CLEAR_ALL', () => {
+    const action = {
+      type: 'PLUGIN:ERROR:CLEAR_ALL',
+      payload: { pluginName: 'mir' }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: { ...initialPluginState, errors: [] }
+    }
+
+    expect(
+      reducer(
+        {
+          ...initialState,
+          mir: {
+            ...initialPluginState,
+            errors: [
+              { key: 'abc', message: 'boom' },
+              { key: 'abcd', message: 'boom2' }
+            ]
+          }
+        },
+        action
+      )
+    ).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:UPDATE_PEER_COUNT', () => {
+    const action = {
+      type: 'PLUGIN:UPDATE_PEER_COUNT',
+      payload: { pluginName: 'mir', peerCount: '3' }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: {
+        ...initialPluginState,
+        active: { ...initialPluginState.active, peerCount: '3' }
+      }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:SET_RELEASE', () => {
+    const release = {
+      name: 'example',
+      fileName: 'example',
+      version: '1.X.X',
+      tag: 'alpha',
+      size: 'example',
+      location: 'example',
+      checksums: 'example',
+      signature: 'example'
+    }
+    const action = {
+      type: 'PLUGIN:SET_RELEASE',
+      payload: { pluginName: 'mir', release }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: { ...initialPluginState, release }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:UPDATE_NEW_BLOCK', () => {
+    const blockNumber = '123123'
+    const timestamp = '321321321'
+    const action = {
+      type: 'PLUGIN:UPDATE_NEW_BLOCK',
+      payload: { pluginName: 'mir', blockNumber, timestamp }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: {
+        ...initialPluginState,
+        active: { ...initialPluginState.active, blockNumber, timestamp }
+      }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:UPDATE_SYNCING', () => {
+    const sync = {
+      currentBlock: 123,
+      highestBlock: 124,
+      knownStates: 125,
+      pulledStates: 124,
+      startingBlock: 0
+    }
+    const action = {
+      type: 'PLUGIN:UPDATE_SYNCING',
+      payload: { pluginName: 'mir', ...sync }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: {
+        ...initialPluginState,
+        active: { ...initialPluginState.active, sync }
+      }
+    }
+
+    expect(reducer(initialState, action)).toEqual(expectedState)
+  })
+
+  it('should handle PLUGIN:CLEAR_SYNCING', () => {
+    const sync = {
+      currentBlock: 123,
+      highestBlock: 124,
+      knownStates: 125,
+      pulledStates: 124,
+      startingBlock: 5
+    }
+    const action = {
+      type: 'PLUGIN:CLEAR_SYNCING',
+      payload: { pluginName: 'mir' }
+    }
+    const expectedState = {
+      ...initialState,
+      mir: {
+        ...initialPluginState,
+        active: {
+          ...initialPluginState.active,
+          sync: initialPluginState.active.sync
+        }
+      }
+    }
+
+    expect(
+      reducer(
+        {
+          ...initialState,
+          mir: {
+            ...initialPluginState,
+            active: { ...initialPluginState.active, sync }
+          }
+        },
+        action
+      )
+    ).toEqual(expectedState)
+  })
+})

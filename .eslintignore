@@ -1,0 +1,8 @@
+__mocks__
+__tests__
+dist
+node_modules
+src/i18n
+src/lib
+src/styles
+src/fakeAPI.js
