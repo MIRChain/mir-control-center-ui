@@ -3,15 +3,15 @@
 Clone, install dependencies, and start the application:
 
 ```
-git clone https://github.com/MIRChain/mir-grid-ui.git
+git clone https://github.com/MIRChain/mir-control-center-ui.git
 cd grid-ui
 yarn && yarn start
 ```
 
-This will serve the application at `localhost:3080`, but little can be done without the [Grid](https://github.com/ethereum/grid) electron wrapper:
+This will serve the application at `localhost:3080`, but little can be done without the [Mir-Control-Center](https://github.com/MIRChain/mir-control-center) electron wrapper:
 
 ```
-git clone https://github.com/MIRChain/mir-grid.git
+git clone https://github.com/MIRChain/mir-control-center.git
 cd grid
 yarn && yarn start:dev
 ```
