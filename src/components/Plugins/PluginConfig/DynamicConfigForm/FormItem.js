@@ -18,7 +18,8 @@ class DynamicConfigFormItem extends Component {
     pluginName: PropTypes.string,
     isPluginRunning: PropTypes.bool,
     handlePluginConfigChanged: PropTypes.func,
-    isEditingFlags: PropTypes.bool
+    isEditingFlags: PropTypes.bool,
+    off: PropTypes.bool
   }
 
   constructor(props) {
@@ -77,9 +78,9 @@ class DynamicConfigFormItem extends Component {
 
   render() {
     const { fieldValue } = this.state
-    const { itemKey, item, isPluginRunning, isEditingFlags } = this.props
+    const { itemKey, item, isPluginRunning, isEditingFlags, off } = this.props
     const label = item.label || itemKey
-    const disabled = isPluginRunning || isEditingFlags
+    const disabled = isPluginRunning || isEditingFlags || off
     let { type } = item
     if (!type) type = item.options ? 'select' : 'text'
     let options

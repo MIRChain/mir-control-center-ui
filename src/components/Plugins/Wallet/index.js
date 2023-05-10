@@ -7,10 +7,8 @@ import { BigNumber } from 'bignumber.js'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Modal from '@material-ui/core/Modal'
-import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import FormControl from '@material-ui/core/FormControl'
-import InputLabel from '@material-ui/core/InputLabel'
 import AddBoxIcon from '@material-ui/icons/AddBox'
 import LockOpenIcon from '@material-ui/icons/LockOpen'
 import SendIcon from '@material-ui/icons/Send'
@@ -232,17 +230,18 @@ class Wallet extends Component {
               disabled={!isPluginRunning}
               className={classes.formControl}
             >
-              <InputLabel shrink htmlFor="account-label-placeholder">
-                Accounts
-              </InputLabel>
-              <Select
-                value={this.state.selectedAccount}
+              <TextField
+                select
+                required
+                label="Account"
+                value={this.state.selectedAccount || ''}
                 onChange={this.handleChange('selectedAccount')}
-                name="Accounts"
+                helperText="Please select account"
                 fullWidth
+                defaultValue={""}
               >
                 {opts}
-              </Select>
+              </TextField>
               <IconButton
                 classes={{ label: classes.iconButtonLabel }}
                 color="primary"

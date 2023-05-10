@@ -13,7 +13,7 @@ import DynamicConfigForm from './DynamicConfigForm'
 import AboutPlugin from './AboutPlugin'
 import Terminal from '../Terminal'
 import NodeInfo from '../NodeInfo'
-import PrivateNet from '../PrivateNet'
+import CustomNet from '../PrivateNet'
 import Wallet from '../Wallet'
 
 import {
@@ -279,7 +279,7 @@ class PluginConfig extends Component {
               data-test-id="navbar-item-terminal"
             />
             <Tab label="Wallet" data-test-id="navbar-item-wallet" />
-            {/* <Tab label="PrivateNet" data-test-id="navbar-item-privatenet" /> */}
+            {/* <Tab label="CustomNet" data-test-id="navbar-item-privatenet" /> */}
           </Tabs>
         </StyledAppBar>
 
@@ -317,7 +317,7 @@ class PluginConfig extends Component {
         )}
         {/* {selectedTab === 5 && (
           <TabContainer>
-            <PrivateNet plugin={plugin} />
+            <CustomNet plugin={plugin} />
           </TabContainer>
         )} */}
       </Fragment>

@@ -31,6 +31,7 @@
     "bn.js": "^4.11.8",
     "classnames": "^2.2.6",
     "codemirror": "^5.48.0",
+    "file-saver": "^2.0.5",
     "fsevents": "^2.3.2",
     "lodash": "^4.17.13",
     "moment": "^2.24.0",
