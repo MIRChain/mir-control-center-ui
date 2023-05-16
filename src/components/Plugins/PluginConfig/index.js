@@ -13,7 +13,6 @@ import DynamicConfigForm from './DynamicConfigForm'
 import AboutPlugin from './AboutPlugin'
 import Terminal from '../Terminal'
 import NodeInfo from '../NodeInfo'
-import CustomNet from '../PrivateNet'
 import Wallet from '../Wallet'
 
 import {
