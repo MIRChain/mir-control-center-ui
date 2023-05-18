@@ -96,7 +96,9 @@ class Genesis extends Component {
       miningBeneficiary: '0x0000000000000000000000000000000000000007',
       validatorselectionmode: '',
       validator: '',
-      validators: []
+      validators: [],
+      cliquePeriod: 0,
+      cliqueEpoch: 0
     }
   }
 
@@ -181,8 +183,8 @@ class Genesis extends Component {
 
     if (this.state.selectedConsensus.value === 'clique') {
       genesis.config.clique = {
-        period: this.state.cliquePeriod,
-        epoch: this.state.cliqueEpoch
+        period: parseInt(this.state.cliquePeriod, 10),
+        epoch: parseInt(this.state.cliqueEpoch, 10)
       }
     }
 
@@ -194,7 +196,7 @@ class Genesis extends Component {
       genesis.config.isQuorum = true
       genesis.config.txnSizeLimit = this.state.txnSizeLimit
       genesis.config.maxCodeSizeConfig = this.state.maxCodeSizeConfig
-      
+
       genesis.config.ibft.epochlength = this.state.epochlength
       genesis.config.ibft.blockperiodseconds = this.state.blockperiodseconds
       genesis.config.ibft.emptyblockperiodseconds = this.state.emptyblockperiodseconds
@@ -232,8 +234,9 @@ class Genesis extends Component {
     genesis.coinbase = this.state.coinbase
     genesis.alloc = {}
 
+    const json = JSON.stringify(genesis, null, 2)
 
-    var blob = new Blob([JSON.stringify(genesis)], {
+    var blob = new Blob([json], {
       type: 'text/plain;charset=utf-8'
     })
     FileSaver.saveAs(blob, 'genesis.json')
@@ -292,7 +295,7 @@ class Genesis extends Component {
             label="Period"
             value={this.state.cliquePeriod}
             onChange={this.handleChange('cliquePeriod')}
-            placeholder="5"
+            placeholder={20}
             helperText="Period in seconds of block mining"
             fullWidth
           />
@@ -313,7 +316,7 @@ class Genesis extends Component {
             label="Epoch"
             value={this.state.cliqueEpoch}
             onChange={this.handleChange('cliqueEpoch')}
-            placeholder="3000"
+            placeholder={30000}
             helperText="Default number of blocks after which to checkpoint and reset the pending votes"
             fullWidth
           />

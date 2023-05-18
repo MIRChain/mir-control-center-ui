@@ -17,6 +17,7 @@ import FolderOpenIcon from '@material-ui/icons/FolderOpenOutlined'
 import AddBoxIcon from '@material-ui/icons/AddBox'
 import { withStyles } from '@material-ui/core/styles'
 import GenesisPreview from './genesis/GenesisPreview'
+import PluginService from '../../../../store/plugin/pluginService'
 
 const styles = theme => ({
   iconButtonLabel: {
@@ -39,7 +40,7 @@ class DynamicConfigForm extends Component {
     super(props)
     this.inputOpenFileRef = React.createRef()
 
-    const { pluginState } = props
+    const { pluginState, settings } = props
     const preloadPlugin = window.Grid.PluginHost.getPluginByName(
       pluginState.selected
     )
@@ -84,6 +85,12 @@ class DynamicConfigForm extends Component {
     if (!checked) {
       dispatch(setFlags(preloadPlugin, config))
     }
+  }
+
+  toggleInitializePlugin = flags => {
+    const { plugin, pluginState } = this.props
+    const { config, release } = pluginState[pluginState.selected]
+    PluginService.start(plugin, release, flags, config)
   }
 
   wrapGridItem = (el, index) => {
@@ -165,8 +172,8 @@ class DynamicConfigForm extends Component {
       return (
         <div>
           <hr style={{ opacity: 0.7 }} />
-          <Grid container style={{ marginTop: 5, marginBottom: 15 }}>
-            <Grid item xs={12}>
+          <Grid container style={{ marginTop: 15, marginBottom: 15 }}>
+            <Grid item xs={12} style={{ marginTop: 10, marginBottom: 10 }}>
               <Typography variant="body1">
                 Configure a custom network
               </Typography>
@@ -234,7 +241,16 @@ class DynamicConfigForm extends Component {
               <Button
                 style={{ marginTop: 5 }}
                 color="primary"
-                onClick={() => this.handleOpen('genesisModal')}
+                onClick={() =>
+                  this.toggleInitializePlugin([
+                    '--crypto',
+                    config.cryptoType,
+                    'init',
+                    this.state.fieldValue,
+                    '--datadir',
+                    config.dataDir
+                  ])
+                }
                 variant="outlined"
               >
                 Initialize
@@ -249,7 +265,14 @@ class DynamicConfigForm extends Component {
           </Grid>
           <div style={{ marginTop: 30 }}>
             <GenesisPreview
-              flags={flags}
+              flags={[
+                '--crypto',
+                config.cryptoType,
+                'init',
+                this.state.fieldValue,
+                '--datadir',
+                config.dataDir
+              ]}
               config={config}
               plugin={plugin}
               isEditingFlags={isEditingFlags}
