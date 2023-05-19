@@ -11,6 +11,7 @@ import AddBoxIcon from '@material-ui/icons/AddBox'
 import RemoveIcon from '@material-ui/icons/Remove'
 import IconButton from '@material-ui/core/IconButton'
 import InputAdornment from '@material-ui/core/InputAdornment'
+import { each } from 'lodash'
 
 function getModalStyle() {
   const top = 50
@@ -97,8 +98,11 @@ class Genesis extends Component {
       validatorselectionmode: '',
       validator: '',
       validators: [],
-      cliquePeriod: 0,
-      cliqueEpoch: 0
+      cliquePeriod: 5,
+      cliqueEpoch: 30000,
+      allocations: [],
+      addrToAlloc: '',
+      addrToAllocAmount: 0
     }
   }
 
@@ -126,6 +130,25 @@ class Genesis extends Component {
     if (index !== -1) {
       array.splice(index, 1)
       this.setState({ cliqueSigners: array })
+    }
+  }
+
+  addAllocation = () => {
+    const alloc = {
+      addr: this.state.addrToAlloc,
+      amount: this.state.addrToAllocAmount
+    }
+    console.log(alloc)
+    this.setState(prevState => ({
+      allocations: [...prevState.allocations, alloc]
+    }))
+  }
+
+  removeAllocation = () => {
+    var array = [...this.state.allocations]
+    if (array.length > 0) {
+      array.splice(-1)
+      this.setState({ allocations: array })
     }
   }
 
@@ -186,10 +209,20 @@ class Genesis extends Component {
         period: parseInt(this.state.cliquePeriod, 10),
         epoch: parseInt(this.state.cliqueEpoch, 10)
       }
+      var data =
+        '0x0000000000000000000000000000000000000000000000000000000000000000'
+      this.state.cliqueSigners.forEach(signer => {
+        data = data + signer.replace('0x', '')
+      })
+      data =
+        data +
+        '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+      genesis.extraData = data
     }
 
     if (this.state.selectedConsensus.value === 'ethash') {
       genesis.config.ethash = {}
+      genesis.extraData = this.state.extraData
     }
 
     if (this.state.selectedConsensus.value === 'ibft') {
@@ -204,6 +237,7 @@ class Genesis extends Component {
       genesis.config.ibft.policy = this.state.policy
       genesis.config.ibft.ceil2Nby3Block = this.state.ceil2Nby3Block
       genesis.config.ibft.validatorcontractaddress = this.state.validatorcontractaddress
+      genesis.extraData = this.state.extraData
     }
 
     if (this.state.selectedConsensus.value === 'qbft') {
@@ -222,17 +256,21 @@ class Genesis extends Component {
       genesis.config.qbft.miningBeneficiary = this.state.miningBeneficiary
       genesis.config.qbft.validatorselectionmode = this.state.validatorselectionmode
       genesis.config.qbft.validators = this.state.validators
+      genesis.extraData = this.state.extraData
     }
 
     genesis.nonce = this.state.nonce
     genesis.timestamp = this.state.timestamp
-    genesis.extraData = this.state.extraData
     genesis.gasLimit = this.state.gasLimit
     genesis.difficulty = this.state.difficulty
     genesis.mixHash = this.state.mixHash
     genesis.parentHash = this.state.parentHash
     genesis.coinbase = this.state.coinbase
     genesis.alloc = {}
+    this.state.allocations.forEach(alloc => {
+      const a = alloc.addr.replace('0x', '')
+      genesis.alloc[a] = { balance: alloc.amount }
+    })
 
     const json = JSON.stringify(genesis, null, 2)
 
@@ -250,7 +288,8 @@ class Genesis extends Component {
       cliqueSigners,
       cliqueSigner,
       beneficiaryList,
-      validators
+      validators,
+      allocations
     } = this.state
 
     const opts = consensuses.map(cons => (
@@ -262,6 +301,12 @@ class Genesis extends Component {
     const signers = cliqueSigners.map((s, idx) => (
       <Typography key={idx} value={s}>
         {idx}. {s}
+      </Typography>
+    ))
+
+    const alloc = allocations.map((s, idx) => (
+      <Typography key={idx}>
+        {idx}. {s.addr} {s.amount}
       </Typography>
     ))
 
@@ -828,44 +873,48 @@ class Genesis extends Component {
                 />
               </Grid>
             )}
-            <Grid
-              item
-              xs={12}
-              style={{
-                paddingTop: 5,
-                paddingBottom: 5,
-                paddingLeft: 5,
-                paddingRight: 5
-              }}
-            >
-              <TextField
-                variant="outlined"
-                label="extraData"
-                value={this.state.extraData}
-                onChange={this.handleChange('extraData')}
-                placeholder={this.state.extraData}
-                fullWidth
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              style={{
-                paddingTop: 5,
-                paddingBottom: 5,
-                paddingLeft: 5,
-                paddingRight: 5
-              }}
-            >
-              <TextField
-                variant="outlined"
-                label="mixHash"
-                value={this.state.mixHash}
-                onChange={this.handleChange('mixHash')}
-                placeholder={this.state.mixHash}
-                fullWidth
-              />
-            </Grid>
+            {selectedConsensus.value !== 'clique' && (
+              <Grid
+                item
+                xs={12}
+                style={{
+                  paddingTop: 5,
+                  paddingBottom: 5,
+                  paddingLeft: 5,
+                  paddingRight: 5
+                }}
+              >
+                <TextField
+                  variant="outlined"
+                  label="extraData"
+                  value={this.state.extraData}
+                  onChange={this.handleChange('extraData')}
+                  placeholder={this.state.extraData}
+                  fullWidth
+                />
+              </Grid>
+            )}
+            {selectedConsensus.value !== 'clique' && (
+              <Grid
+                item
+                xs={12}
+                style={{
+                  paddingTop: 5,
+                  paddingBottom: 5,
+                  paddingLeft: 5,
+                  paddingRight: 5
+                }}
+              >
+                <TextField
+                  variant="outlined"
+                  label="mixHash"
+                  value={this.state.mixHash}
+                  onChange={this.handleChange('mixHash')}
+                  placeholder={this.state.mixHash}
+                  fullWidth
+                />
+              </Grid>
+            )}
             <Grid
               item
               xs={6}
@@ -1055,6 +1104,52 @@ class Genesis extends Component {
                 placeholder={this.state.constantinopleBlock}
                 fullWidth
               />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              style={{
+                paddingTop: 5,
+                paddingBottom: 5,
+                paddingLeft: 5,
+                paddingRight: 5
+              }}
+              key={'allocations'}
+            >
+              <TextField
+                variant="outlined"
+                label="Allocations"
+                value={this.state.addrToAlloc}
+                onChange={this.handleChange('addrToAlloc')}
+                placeholder="0x0000000000000000000000000000000000000000"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <TextField
+                        label="Amount"
+                        value={this.state.addrToAllocAmount}
+                        onChange={this.handleChange('addrToAllocAmount')}
+                      ></TextField>
+                      <IconButton
+                        edge="end"
+                        color="primary"
+                        onClick={this.addAllocation}
+                      >
+                        <AddBoxIcon />
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        color="primary"
+                        onClick={this.removeAllocation}
+                      >
+                        <RemoveIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                fullWidth
+              />
+              {alloc}
             </Grid>
           </Grid>
 
